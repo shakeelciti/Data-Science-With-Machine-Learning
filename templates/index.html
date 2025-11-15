@@ -1,16 +1,25 @@
+<!-- Declare HTML5 document type -->
 <!DOCTYPE html>
+<!-- Start HTML document with English language setting -->
 <html lang="en">
+<!-- Start head section containing metadata and styling -->
 <head>
+    <!-- Set character encoding to UTF-8 for proper text display -->
     <meta charset="UTF-8">
+    <!-- Set viewport for responsive design on mobile and desktop -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Set page title displayed in browser tab -->
     <title>Data Visualization Dashboard - Upload</title>
+    <!-- Start CSS styling section -->
     <style>
+        /* Reset default margins and padding for all elements */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
+        /* Style body with gradient background and center content vertically/horizontally */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,6 +30,7 @@
             padding: 20px;
         }
         
+        /* Style main container with white background and shadow */
         .container {
             background: white;
             border-radius: 20px;
@@ -30,6 +40,7 @@
             width: 100%;
         }
         
+        /* Style main heading */
         h1 {
             color: #333;
             margin-bottom: 10px;
@@ -37,12 +48,14 @@
             text-align: center;
         }
         
+        /* Style subtitle text */
         .subtitle {
             color: #666;
             text-align: center;
             margin-bottom: 30px;
         }
         
+        /* Style upload drag-and-drop area */
         .upload-area {
             border: 3px dashed #667eea;
             border-radius: 15px;
@@ -53,38 +66,45 @@
             background: #f8f9ff;
         }
         
+        /* Add hover effect to upload area */
         .upload-area:hover {
             background: #f0f2ff;
             border-color: #764ba2;
         }
         
+        /* Style upload area when file is dragged over it */
         .upload-area.dragover {
             background: #e8ebff;
             border-color: #764ba2;
             transform: scale(1.02);
         }
         
+        /* Style upload icon emoji */
         .upload-icon {
             font-size: 60px;
             color: #667eea;
             margin-bottom: 20px;
         }
         
+        /* Style main upload text */
         .upload-text {
             color: #333;
             font-size: 18px;
             margin-bottom: 10px;
         }
         
+        /* Style hint text below upload area */
         .upload-hint {
             color: #999;
             font-size: 14px;
         }
         
+        /* Hide file input field (will be triggered by click) */
         input[type="file"] {
             display: none;
         }
         
+        /* Style upload button with gradient background */
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -98,17 +118,20 @@
             transition: all 0.3s ease;
         }
         
+        /* Add hover effect to button (lift animation) */
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
         
+        /* Style disabled button state */
         .btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
         
+        /* Style message containers (for errors, success, info) */
         .message {
             padding: 15px;
             border-radius: 10px;
@@ -116,24 +139,28 @@
             display: none;
         }
         
+        /* Style error message with red background */
         .message.error {
             background: #fee;
             color: #c33;
             border: 1px solid #fcc;
         }
         
+        /* Style success message with green background */
         .message.success {
             background: #efe;
             color: #3c3;
             border: 1px solid #cfc;
         }
         
+        /* Style info message with blue background */
         .message.info {
             background: #eef;
             color: #33c;
             border: 1px solid #ccf;
         }
         
+        /* Style file information display area */
         .file-info {
             background: #f8f9ff;
             padding: 15px;
@@ -142,16 +169,19 @@
             display: none;
         }
         
+        /* Style file info heading */
         .file-info h3 {
             color: #667eea;
             margin-bottom: 10px;
         }
         
+        /* Style file details text */
         .file-details {
             color: #666;
             line-height: 1.6;
         }
         
+        /* Style loading spinner animation */
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -163,203 +193,296 @@
             display: none;
         }
         
+        /* Define spinning animation keyframes */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
     </style>
+<!-- Close head section -->
 </head>
+<!-- Start body section -->
 <body>
+    <!-- Main container for the upload form -->
     <div class="container">
+        <!-- Page heading with emoji icon -->
         <h1>📊 Data Visualization Dashboard</h1>
+        <!-- Subtitle explaining what to do -->
         <p class="subtitle">Upload your Excel or CSV file to get started</p>
         
+        <!-- Form for file upload with multipart encoding -->
         <form id="uploadForm" enctype="multipart/form-data">
+            <!-- Drag and drop area for file selection -->
             <div class="upload-area" id="uploadArea">
+                <!-- Large folder icon -->
                 <div class="upload-icon">📁</div>
+                <!-- Main instruction text -->
                 <div class="upload-text">Drag & Drop your file here</div>
+                <!-- Secondary instruction text -->
                 <div class="upload-hint">or click to browse (Excel or CSV files)</div>
+                <!-- Hidden file input field (triggered when area is clicked) -->
                 <input type="file" id="fileInput" name="file" accept=".xlsx,.xls,.csv">
             </div>
         </form>
         
+        <!-- Container for displaying selected file information -->
         <div class="file-info" id="fileInfo">
+            <!-- Heading for file info section -->
             <h3>✅ Selected File:</h3>
+            <!-- Container where file details will be inserted -->
             <div class="file-details" id="fileDetails"></div>
         </div>
         
+        <!-- Button to upload and analyze the file (initially disabled) -->
         <button class="btn" id="uploadBtn" disabled>Upload & Analyze</button>
         
+        <!-- Loading spinner shown during upload -->
         <div class="loader" id="loader"></div>
         
+        <!-- Container for displaying status messages (error/success/info) -->
         <div class="message" id="message"></div>
     </div>
 
+    <!-- Start JavaScript section for interactivity -->
     <script>
+        // Get reference to upload drop area element
         const uploadArea = document.getElementById('uploadArea');
+        // Get reference to hidden file input element
         const fileInput = document.getElementById('fileInput');
+        // Get reference to upload button element
         const uploadBtn = document.getElementById('uploadBtn');
+        // Get reference to file info display container
         const fileInfo = document.getElementById('fileInfo');
+        // Get reference to file details text container
         const fileDetails = document.getElementById('fileDetails');
+        // Get reference to message display container
         const message = document.getElementById('message');
+        // Get reference to loading spinner element
         const loader = document.getElementById('loader');
+        // Get reference to upload form element
         const uploadForm = document.getElementById('uploadForm');
         
+        // Variable to store the selected file object
         let selectedFile = null;
         
-        // Click to upload
+        // Click on upload area to trigger file input
         uploadArea.addEventListener('click', () => {
             fileInput.click();
         });
         
-        // File selection
+        // Handle file selection from file input dialog
         fileInput.addEventListener('change', (e) => {
+            // Check if a file was selected
             if (e.target.files.length > 0) {
+                // Process the first selected file
                 handleFile(e.target.files[0]);
             }
         });
         
-        // Prevent default drag behaviors
+        // Prevent default drag behaviors on all drag events
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            // Add listener to upload area for all drag events
             uploadArea.addEventListener(eventName, preventDefaults, false);
+            // Add listener to document body for all drag events
             document.body.addEventListener(eventName, preventDefaults, false);
         });
         
+        // Function to prevent default drag and drop behavior
         function preventDefaults(e) {
+            // Prevent browser default action
             e.preventDefault();
+            // Stop event propagation to parent elements
             e.stopPropagation();
         }
         
-        // Highlight drop area
+        // Highlight upload area when file is dragged over it
         ['dragenter', 'dragover'].forEach(eventName => {
             uploadArea.addEventListener(eventName, () => {
+                // Add dragover class to show visual feedback
                 uploadArea.classList.add('dragover');
             }, false);
         });
         
+        // Remove highlight when file leaves drop area
         ['dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, () => {
+                // Remove dragover class when file leaves or is dropped
                 uploadArea.classList.remove('dragover');
             }, false);
         });
         
-        // Handle dropped files
+        // Handle file drop on upload area
         uploadArea.addEventListener('drop', (e) => {
+            // Get data transfer object containing dropped files
             const dt = e.dataTransfer;
+            // Get files array from data transfer
             const files = dt.files;
             
+            // Check if any files were dropped
             if (files.length > 0) {
+                // Process the first dropped file
                 handleFile(files[0]);
             }
         });
         
+        // Function to process and validate selected file
         function handleFile(file) {
+            // Log file name to console for debugging
             console.log('File selected:', file.name);
             
+            // Check if file object exists
             if (!file) {
+                // Show error message if no file
                 showMessage('No file selected', 'error');
                 return;
             }
             
-            // Check file extension
+            // Get file name in lowercase for extension checking
             const fileName = file.name.toLowerCase();
+            // Define allowed file extensions
             const validExtensions = ['.xlsx', '.xls', '.csv'];
+            // Check if file ends with any valid extension
             const isValid = validExtensions.some(ext => fileName.endsWith(ext));
             
+            // Validate file extension
             if (!isValid) {
+                // Show error if file type is not supported
                 showMessage('❌ Please upload a valid Excel (.xlsx, .xls) or CSV (.csv) file', 'error');
                 return;
             }
             
             // Check file size (max 16MB)
             if (file.size > 16 * 1024 * 1024) {
+                // Show error if file exceeds size limit
                 showMessage('❌ File size must be less than 16MB', 'error');
                 return;
             }
             
+            // Store the selected file in variable
             selectedFile = file;
             
-            // Display file info
+            // Convert file size to KB
             const sizeKB = (file.size / 1024).toFixed(2);
+            // Convert file size to MB
             const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            // Choose display format based on file size
             const sizeDisplay = file.size > 1024 * 1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
             
+            // Create HTML to display file information
             fileDetails.innerHTML = `
                 <strong>📄 Name:</strong> ${file.name}<br>
                 <strong>📦 Size:</strong> ${sizeDisplay}<br>
                 <strong>📋 Type:</strong> ${file.type || fileName.split('.').pop().toUpperCase()}
             `;
             
+            // Show file info container
             fileInfo.style.display = 'block';
+            // Enable upload button
             uploadBtn.disabled = false;
+            // Hide any previous messages
             message.style.display = 'none';
             
+            // Show success message
             showMessage('✅ File ready to upload!', 'success');
         }
         
+        // Handle upload button click
         uploadBtn.addEventListener('click', async () => {
+            // Check if a file was selected
             if (!selectedFile) {
+                // Show error if no file is selected
                 showMessage('❌ Please select a file first', 'error');
                 return;
             }
             
+            // Create FormData object for file upload
             const formData = new FormData();
+            // Add selected file to form data with key 'file'
             formData.append('file', selectedFile);
             
+            // Disable button during upload
             uploadBtn.disabled = true;
+            // Change button text to show uploading status
             uploadBtn.textContent = 'Uploading...';
+            // Show loading spinner
             loader.style.display = 'block';
+            // Hide any previous messages
             message.style.display = 'none';
             
             try {
+                // Log that upload is starting
                 console.log('Uploading file to /upload...');
                 
+                // Send POST request to backend upload endpoint
                 const response = await fetch('/upload', {
+                    // Use POST method
                     method: 'POST',
+                    // Send form data containing file
                     body: formData
                 });
                 
+                // Log response status code
                 console.log('Response status:', response.status);
                 
+                // Parse response as JSON
                 const result = await response.json();
+                // Log response data for debugging
                 console.log('Response data:', result);
                 
+                // Hide loading spinner
                 loader.style.display = 'none';
+                // Restore button text to original
                 uploadBtn.textContent = 'Upload & Analyze';
                 
+                // Check if response was successful
                 if (response.ok && result.success) {
+                    // Show success message with data statistics
                     showMessage(
                         `✅ Success! Found ${result.rows} rows, ${result.dimensions.length} dimensions, and ${result.measures.length} measures. Redirecting to dashboard...`,
                         'success'
                     );
                     
-                    // Redirect to dashboard
+                    // Redirect to dashboard after 2 seconds
                     setTimeout(() => {
                         window.location.href = '/dashboard';
                     }, 2000);
                 } else {
+                    // Show error message from backend or generic error
                     showMessage('❌ ' + (result.error || 'Upload failed. Please try again.'), 'error');
+                    // Re-enable button if upload failed
                     uploadBtn.disabled = false;
                 }
             } catch (error) {
+                // Log error to console for debugging
                 console.error('Upload error:', error);
+                // Hide loading spinner
                 loader.style.display = 'none';
+                // Restore button text to original
                 uploadBtn.textContent = 'Upload & Analyze';
+                // Show error message with details about the error
                 showMessage('❌ Network error: ' + error.message + '. Make sure Flask server is running.', 'error');
+                // Re-enable button if network error occurs
                 uploadBtn.disabled = false;
             }
         });
         
+        // Function to display status messages
         function showMessage(text, type) {
+            // Set message text content
             message.textContent = text;
+            // Set message CSS class based on type (error/success/info)
             message.className = 'message ' + type;
+            // Make message visible
             message.style.display = 'block';
         }
         
-        // Check if server is running on load
+        // Check page loaded and log ready status
         window.addEventListener('load', () => {
+            // Log that page is ready for file uploads
             console.log('Page loaded. Ready to upload files.');
         });
     </script>
+<!-- Close body section -->
 </body>
+<!-- Close HTML document -->
 </html>

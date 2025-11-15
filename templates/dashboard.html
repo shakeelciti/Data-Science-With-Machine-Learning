@@ -1,22 +1,33 @@
+<!-- Declare HTML5 document type -->
 <!DOCTYPE html>
+<!-- Start HTML document with English language -->
 <html lang="en">
+<!-- Start head section with metadata and styling -->
 <head>
+    <!-- Set character encoding to UTF-8 for proper text rendering -->
     <meta charset="UTF-8">
+    <!-- Set viewport for responsive design on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Set the page title that appears in browser tab -->
     <title>Interactive Dashboard</title>
+    <!-- Import Plotly.js library for creating interactive charts -->
     <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <!-- Start CSS styling section -->
     <style>
+        /* Reset all margins, padding, and set box-sizing for all elements */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
+        /* Style the body with font and light background color */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f5f7fa;
         }
         
+        /* Style the header with gradient background and white text */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -24,20 +35,24 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
+        /* Style the main heading in the header */
         .header h1 {
             font-size: 2em;
             margin-bottom: 5px;
         }
         
+        /* Style the header information text (file details) */
         .header-info {
             opacity: 0.9;
             font-size: 14px;
         }
         
+        /* Style the container for navigation buttons */
         .nav-buttons {
             margin-top: 15px;
         }
         
+        /* Style individual navigation buttons */
         .nav-btn {
             background: rgba(255,255,255,0.2);
             color: white;
@@ -50,16 +65,19 @@
             transition: all 0.3s;
         }
         
+        /* Add hover effect to navigation buttons */
         .nav-btn:hover {
             background: rgba(255,255,255,0.3);
         }
         
+        /* Style the main container that holds all chart sections */
         .container {
             max-width: 1400px;
             margin: 30px auto;
             padding: 0 20px;
         }
         
+        /* Style individual chart section containers */
         .chart-section {
             background: white;
             border-radius: 15px;
@@ -68,6 +86,7 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
         
+        /* Style the section headings */
         .chart-section h2 {
             color: #333;
             margin-bottom: 20px;
@@ -76,6 +95,7 @@
             gap: 10px;
         }
         
+        /* Style the control area using CSS Grid for responsive layout */
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -83,11 +103,13 @@
             margin-bottom: 20px;
         }
         
+        /* Style individual control groups (label + select combination) */
         .control-group {
             display: flex;
             flex-direction: column;
         }
         
+        /* Style labels in control groups */
         .control-group label {
             color: #666;
             font-size: 14px;
@@ -95,6 +117,7 @@
             margin-bottom: 8px;
         }
         
+        /* Style dropdown select elements */
         .control-group select {
             padding: 12px;
             border: 2px solid #e1e8ed;
@@ -105,11 +128,13 @@
             transition: all 0.3s;
         }
         
+        /* Add focus style to dropdowns (when selected) */
         .control-group select:focus {
             outline: none;
             border-color: #667eea;
         }
         
+        /* Style the generate chart button */
         .btn-generate {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -122,11 +147,13 @@
             margin-top: 10px;
         }
         
+        /* Add hover effect to generate button with shadow and lift animation */
         .btn-generate:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
+        /* Style the container where charts are displayed */
         .chart-container {
             min-height: 400px;
             display: flex;
@@ -135,11 +162,13 @@
             color: #999;
         }
         
+        /* Style loading message text */
         .loading {
             text-align: center;
             color: #667eea;
         }
         
+        /* Style error message boxes */
         .error {
             background: #fee;
             color: #c33;
@@ -149,6 +178,7 @@
             margin-top: 15px;
         }
         
+        /* Style informational tip boxes */
         .tip {
             background: #f0f7ff;
             color: #0066cc;
@@ -159,145 +189,217 @@
             font-size: 14px;
         }
     </style>
+<!-- Close head section -->
 </head>
+<!-- Start body section -->
 <body>
+    <!-- Start header section with dashboard title and file information -->
     <div class="header">
+        <!-- Display dashboard title with icon -->
         <h1>📊 Interactive Data Dashboard</h1>
+        <!-- Display file information: filename, number of rows, and number of columns -->
         <div class="header-info">
+            <!-- Display the filename from template variable -->
             File: <strong>{{ filename }}</strong> | 
+            <!-- Display the number of rows from template variable -->
             Rows: <strong>{{ rows }}</strong> | 
+            <!-- Display the number of columns from template variable -->
             Columns: <strong>{{ columns }}</strong>
         </div>
+        <!-- Container for navigation buttons -->
         <div class="nav-buttons">
+            <!-- Button to return to home page and upload new file -->
             <button class="nav-btn" onclick="window.location.href='/'">📤 Upload New File</button>
         </div>
     </div>
     
+    <!-- Start main container for all chart sections -->
     <div class="container">
-        <!-- Bar Chart Section -->
+        <!-- Start Bar Chart Section -->
         <div class="chart-section">
+            <!-- Bar chart heading with icon -->
             <h2>📊 Bar Chart</h2>
+            <!-- Informational tip explaining how to use the bar chart -->
             <div class="tip">💡 Choose a TEXT column for Dimension and a NUMBER column for Measure. Optionally add a second dimension for grouped/faceted bars</div>
             
+            <!-- Start controls for bar chart -->
             <div class="controls">
+                <!-- Control group for first dimension (X-axis) -->
                 <div class="control-group">
+                    <!-- Label for dimension 1 dropdown -->
                     <label for="barDimension1">Dimension 1 (X-Axis)</label>
+                    <!-- Dropdown to select first dimension from template dimensions -->
                     <select id="barDimension1">
+                        <!-- Loop through dimensions and create option for each -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}">{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for measure (numeric value) -->
                 <div class="control-group">
+                    <!-- Label for measure dropdown -->
                     <label for="barMeasure">Measure (Numeric)</label>
+                    <!-- Dropdown to select measure from template measures -->
                     <select id="barMeasure">
+                        <!-- Loop through measures and create option for each -->
                         {% for meas in measures %}
                         <option value="{{ meas }}">{{ meas }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for optional second dimension -->
                 <div class="control-group">
+                    <!-- Label for second dimension dropdown (optional) -->
                     <label for="barDimension2">Dimension 2 (Color/Facet) - Optional</label>
+                    <!-- Dropdown to select second dimension with "None" option -->
                     <select id="barDimension2">
+                        <!-- Default option for no second dimension -->
                         <option value="">None</option>
+                        <!-- Loop through dimensions and create option for each -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}">{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for facet checkbox -->
                 <div class="control-group">
+                    <!-- Checkbox label to enable faceted layout -->
                     <label style="display: flex; align-items: center; gap: 8px;">
+                        <!-- Checkbox input for facet toggle -->
                         <input type="checkbox" id="barUseFacet"> Use Faceted Layout
                     </label>
+                    <!-- Help text explaining what facets do -->
                     <small style="color: #999; margin-top: 5px;">Facets create separate subplots for each category</small>
                 </div>
                 
+                <!-- Control group for generate button -->
                 <div class="control-group">
+                    <!-- Button to trigger bar chart generation -->
                     <button class="btn-generate" onclick="generateBarChart()">Generate Chart</button>
                 </div>
             </div>
             
+            <!-- Container where bar chart will be displayed -->
             <div id="barChart" class="chart-container">
+                <!-- Placeholder text shown before chart generation -->
                 Select dimension and measure, then click "Generate Chart"
             </div>
+            <!-- Error message container for bar chart -->
             <div id="barError"></div>
         </div>
         
-        <!-- Pie Chart Section -->
+        <!-- Start Pie Chart Section -->
         <div class="chart-section">
+            <!-- Pie chart heading with icon -->
             <h2>🥧 Pie Chart</h2>
+            <!-- Informational tip about pie charts -->
             <div class="tip">💡 Best for showing proportions and distributions</div>
             
+            <!-- Start controls for pie chart -->
             <div class="controls">
+                <!-- Control group for pie chart dimension -->
                 <div class="control-group">
+                    <!-- Label for pie dimension dropdown -->
                     <label for="pieDimension">Dimension (Category)</label>
+                    <!-- Dropdown to select dimension for pie chart -->
                     <select id="pieDimension">
+                        <!-- Loop through dimensions and create option for each -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}">{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for pie chart measure -->
                 <div class="control-group">
+                    <!-- Label for pie measure dropdown -->
                     <label for="pieMeasure">Measure (Numeric)</label>
+                    <!-- Dropdown to select measure for pie chart -->
                     <select id="pieMeasure">
+                        <!-- Loop through measures and create option for each -->
                         {% for meas in measures %}
                         <option value="{{ meas }}">{{ meas }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for pie chart generate button -->
                 <div class="control-group">
+                    <!-- Button to trigger pie chart generation -->
                     <button class="btn-generate" onclick="generatePieChart()">Generate Chart</button>
                 </div>
             </div>
             
+            <!-- Container where pie chart will be displayed -->
             <div id="pieChart" class="chart-container">
+                <!-- Placeholder text shown before chart generation -->
                 Select dimension and measure, then click "Generate Chart"
             </div>
+            <!-- Error message container for pie chart -->
             <div id="pieError"></div>
         </div>
         
-        <!-- Sunburst Chart Section -->
+        <!-- Conditional: Show Sunburst Chart only if at least 3 dimensions exist -->
         {% if dimensions|length >= 3 %}
+        <!-- Start Sunburst Chart Section -->
         <div class="chart-section">
+            <!-- Sunburst chart heading with icon -->
             <h2>☀️ Sunburst Chart</h2>
+            <!-- Informational tip explaining sunburst charts -->
             <div class="tip">💡 Select THREE DIFFERENT dimensions to show hierarchical data</div>
             
+            <!-- Start controls for sunburst chart -->
             <div class="controls">
+                <!-- Control group for first hierarchy level (outer) -->
                 <div class="control-group">
+                    <!-- Label for level 1 dimension -->
                     <label for="sunDim1">Level 1 (Outer)</label>
+                    <!-- Dropdown to select first dimension -->
                     <select id="sunDim1">
+                        <!-- Loop through dimensions and create option for each -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}">{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for second hierarchy level (middle) -->
                 <div class="control-group">
+                    <!-- Label for level 2 dimension -->
                     <label for="sunDim2">Level 2 (Middle)</label>
+                    <!-- Dropdown to select second dimension -->
                     <select id="sunDim2">
+                        <!-- Loop through dimensions and pre-select the second one -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}" {% if loop.index == 2 %}selected{% endif %}>{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for third hierarchy level (inner) -->
                 <div class="control-group">
+                    <!-- Label for level 3 dimension -->
                     <label for="sunDim3">Level 3 (Inner)</label>
+                    <!-- Dropdown to select third dimension -->
                     <select id="sunDim3">
+                        <!-- Loop through dimensions and pre-select the third one -->
                         {% for dim in dimensions %}
                         <option value="{{ dim }}" {% if loop.index == 3 %}selected{% endif %}>{{ dim }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
+                <!-- Control group for sunburst measure -->
                 <div class="control-group">
+                    <!-- Label for sunburst measure dropdown -->
                     <label for="sunMeasure">Measure (Numeric)</label>
+                    <!-- Dropdown to select measure for sunburst chart -->
                     <select id="sunMeasure">
+                        <!-- Loop through measures and create option for each -->
                         {% for meas in measures %}
                         <option value="{{ meas }}">{{ meas }}</option>
                         {% endfor %}
@@ -305,40 +407,63 @@
                 </div>
             </div>
             
+            <!-- Button to trigger sunburst chart generation -->
             <button class="btn-generate" onclick="generateSunburstChart()">Generate Chart</button>
             
+            <!-- Container where sunburst chart will be displayed -->
             <div id="sunburstChart" class="chart-container">
+                <!-- Placeholder text shown before chart generation -->
                 Select three different dimensions and one measure, then click "Generate Chart"
             </div>
+            <!-- Error message container for sunburst chart -->
             <div id="sunburstError"></div>
         </div>
+        <!-- Otherwise, if less than 3 dimensions available, show error message -->
         {% else %}
+        <!-- Sunburst unavailable section -->
         <div class="chart-section">
+            <!-- Sunburst heading even though it's not available -->
             <h2>☀️ Sunburst Chart</h2>
+            <!-- Error message explaining why sunburst can't be shown -->
             <div class="error">
+                <!-- Display message with required and actual dimension count -->
                 ⚠️ Sunburst chart requires at least 3 dimensions. Your dataset has only {{ dimensions|length }} dimension(s).
             </div>
         </div>
         {% endif %}
     </div>
 
+    <!-- Start JavaScript section for chart generation functions -->
     <script>
+        // Function to generate bar chart with API call
         async function generateBarChart() {
+            // Get the first dimension value from dropdown
             const dimension1 = document.getElementById('barDimension1').value;
+            // Get the optional second dimension value from dropdown
             const dimension2 = document.getElementById('barDimension2').value;
+            // Get the measure value from dropdown
             const measure = document.getElementById('barMeasure').value;
+            // Check if facet checkbox is selected
             const useFacet = document.getElementById('barUseFacet').checked;
             
+            // Get reference to chart container div
             const chartDiv = document.getElementById('barChart');
+            // Get reference to error container div
             const errorDiv = document.getElementById('barError');
             
+            // Show loading message in chart container
             chartDiv.innerHTML = '<div class="loading">⏳ Generating chart...</div>';
+            // Clear any previous error messages
             errorDiv.innerHTML = '';
             
             try {
+                // Send POST request to backend API for bar chart
                 const response = await fetch('/api/chart/bar', {
+                    // Use POST method for sending data
                     method: 'POST',
+                    // Set content type to JSON
                     headers: { 'Content-Type': 'application/json' },
+                    // Send parameters as JSON body
                     body: JSON.stringify({ 
                         dimension1, 
                         dimension2: dimension2 || null,
@@ -347,84 +472,134 @@
                     })
                 });
                 
+                // Parse response as JSON
                 const result = await response.json();
                 
+                // Check if response was successful
                 if (response.ok) {
+                    // Parse the chart JSON from response
                     const chartData = JSON.parse(result.chart);
+                    // Create new Plotly chart in container
                     Plotly.newPlot(chartDiv, chartData.data, chartData.layout, {responsive: true});
                 } else {
+                    // Clear loading message
                     chartDiv.innerHTML = '';
+                    // Display error message from backend
                     errorDiv.innerHTML = `<div class="error">❌ ${result.error}</div>`;
                 }
             } catch (error) {
+                // Clear loading message on exception
                 chartDiv.innerHTML = '';
+                // Display error message from catch block
                 errorDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
         }
         
+        // Function to generate pie chart with API call
         async function generatePieChart() {
+            // Get the dimension value from dropdown
             const dimension = document.getElementById('pieDimension').value;
+            // Get the measure value from dropdown
             const measure = document.getElementById('pieMeasure').value;
+            // Get reference to chart container div
             const chartDiv = document.getElementById('pieChart');
+            // Get reference to error container div
             const errorDiv = document.getElementById('pieError');
             
+            // Show loading message in chart container
             chartDiv.innerHTML = '<div class="loading">⏳ Generating chart...</div>';
+            // Clear any previous error messages
             errorDiv.innerHTML = '';
             
             try {
+                // Send POST request to backend API for pie chart
                 const response = await fetch('/api/chart/pie', {
+                    // Use POST method for sending data
                     method: 'POST',
+                    // Set content type to JSON
                     headers: { 'Content-Type': 'application/json' },
+                    // Send parameters as JSON body
                     body: JSON.stringify({ dimension, measure })
                 });
                 
+                // Parse response as JSON
                 const result = await response.json();
                 
+                // Check if response was successful
                 if (response.ok) {
+                    // Parse the chart JSON from response
                     const chartData = JSON.parse(result.chart);
+                    // Create new Plotly chart in container
                     Plotly.newPlot(chartDiv, chartData.data, chartData.layout, {responsive: true});
                 } else {
+                    // Clear loading message
                     chartDiv.innerHTML = '';
+                    // Display error message from backend
                     errorDiv.innerHTML = `<div class="error">❌ ${result.error}</div>`;
                 }
             } catch (error) {
+                // Clear loading message on exception
                 chartDiv.innerHTML = '';
+                // Display error message from catch block
                 errorDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
         }
         
+        // Function to generate sunburst chart with API call
         async function generateSunburstChart() {
+            // Get the first dimension value from dropdown
             const dim1 = document.getElementById('sunDim1').value;
+            // Get the second dimension value from dropdown
             const dim2 = document.getElementById('sunDim2').value;
+            // Get the third dimension value from dropdown
             const dim3 = document.getElementById('sunDim3').value;
+            // Get the measure value from dropdown
             const measure = document.getElementById('sunMeasure').value;
+            // Get reference to chart container div
             const chartDiv = document.getElementById('sunburstChart');
+            // Get reference to error container div
             const errorDiv = document.getElementById('sunburstError');
             
+            // Show loading message in chart container
             chartDiv.innerHTML = '<div class="loading">⏳ Generating chart...</div>';
+            // Clear any previous error messages
             errorDiv.innerHTML = '';
             
             try {
+                // Send POST request to backend API for sunburst chart
                 const response = await fetch('/api/chart/sunburst', {
+                    // Use POST method for sending data
                     method: 'POST',
+                    // Set content type to JSON
                     headers: { 'Content-Type': 'application/json' },
+                    // Send parameters as JSON body
                     body: JSON.stringify({ dim1, dim2, dim3, measure })
                 });
                 
+                // Parse response as JSON
                 const result = await response.json();
                 
+                // Check if response was successful
                 if (response.ok) {
+                    // Parse the chart JSON from response
                     const chartData = JSON.parse(result.chart);
+                    // Create new Plotly chart in container
                     Plotly.newPlot(chartDiv, chartData.data, chartData.layout, {responsive: true});
                 } else {
+                    // Clear loading message
                     chartDiv.innerHTML = '';
+                    // Display error message from backend
                     errorDiv.innerHTML = `<div class="error">❌ ${result.error}</div>`;
                 }
             } catch (error) {
+                // Clear loading message on exception
                 chartDiv.innerHTML = '';
+                // Display error message from catch block
                 errorDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
         }
     </script>
+<!-- Close body section -->
 </body>
+<!-- Close HTML document -->
 </html>
